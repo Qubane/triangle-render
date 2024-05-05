@@ -1,4 +1,4 @@
-import TerminalRender as tr
+import termrender as tr
 from time import sleep
 from random import random
 
