@@ -37,12 +37,43 @@ def draw_outline(win: tr.Window, x1, y1, x2, y2, x3, y3, val=1):
     draw_line(win, x3, y3, x1, y1, val)
 
 
+def draw_filled(win: tr.Window, x1, y1, x2, y2, x3, y3, val):
+    if y2 < y1:
+        x2, y2, x1, y1 = x1, y1, x2, y2
+    if y3 < y1:
+        x3, y3, x1, y1 = x1, y1, x3, y3
+    if y3 < y2:
+        x3, y3, x2, y2 = x2, y2, x3, y3
+
+    # fill top triangle
+    slope1 = (x2 - x1) / (y2 - y1)
+    slope2 = (x3 - x1) / (y3 - y1)
+
+    xo1 = xo2 = x1
+
+    for yo in range(int(y1), int(y2)):
+        xo1 += slope1
+        xo2 += slope2
+        draw_line(win, xo1, yo, xo2, yo, val)
+
+    # fill bottom triangle
+    slope1 = (x3 - x1) / (y3 - y1)
+    slope2 = (x3 - x2) / (y3 - y2)
+
+    xo1 = xo2 = x3
+
+    for yo in range(int(y3), int(y1), -1):
+        xo1 -= slope1
+        xo2 -= slope2
+        draw_line(win, xo1, yo, xo2, yo, val)
+
+
 def main():
     win = tr.Window()
     win.initialize(tr.Mode.palette8)
     while True:
         win.update()
-        draw_outline(
+        draw_filled(
             win,
             random() * win.width, random() * win.height,
             random() * win.width, random() * win.height,
