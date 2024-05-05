@@ -3,7 +3,17 @@ from time import sleep
 from random import random
 
 
-def draw_line(win: tr.Window, x1, y1, x2, y2, val=1):
+def draw_line(win: tr.Window, x1, y1, x2, y2, val):
+    """
+    Function that draws a line.
+    :param win: window
+    :param x1: start x
+    :param y1: start y
+    :param x2: end x
+    :param y2: end y
+    :param val: what value to plot
+    """
+
     # naive implementation makes me able to not turn my brain on
     # that's why we shall use that instead
 
@@ -31,13 +41,38 @@ def draw_line(win: tr.Window, x1, y1, x2, y2, val=1):
         y1 += sy
 
 
-def draw_outline(win: tr.Window, x1, y1, x2, y2, x3, y3, val=1):
+def draw_outline(win: tr.Window, x1, y1, x2, y2, x3, y3, val):
+    """
+    Draws triangle outline
+    :param win: window
+    :param x1: p1 x
+    :param y1: p1 y
+    :param x2: p2 x
+    :param y2: p2 y
+    :param x3: p3 x
+    :param y3: p3 y
+    :param val: value to plot
+    """
+
     draw_line(win, x1, y1, x2, y2, val)
     draw_line(win, x2, y2, x3, y3, val)
     draw_line(win, x3, y3, x1, y1, val)
 
 
 def draw_filled(win: tr.Window, x1, y1, x2, y2, x3, y3, val):
+    """
+    Draws filled triangle
+    :param win: window
+    :param x1: p1 x
+    :param y1: p1 y
+    :param x2: p2 x
+    :param y2: p2 y
+    :param x3: p3 x
+    :param y3: p3 y
+    :param val: value to plot
+    """
+
+    # sort the points from top to bottom
     if y2 < y1:
         x2, y2, x1, y1 = x1, y1, x2, y2
     if y3 < y1:
