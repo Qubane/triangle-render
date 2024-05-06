@@ -96,7 +96,6 @@ def draw_filled(win: tr.Window, x1, y1, x2, y2, x3, y3, val):
         slope2 = (x3 - x1) / (y3 - y1)
 
         xo1 = xo2 = x1
-
         for yo in range(int(y1), int(y2)):
             draw_line(win, xo1, yo, xo2, yo, val)
             xo1 += slope1
@@ -105,12 +104,11 @@ def draw_filled(win: tr.Window, x1, y1, x2, y2, x3, y3, val):
     # check for bottom-flat triangle
     if y2 - y3 != 0:
         # fill bottom triangle
-        slope1 = (x3 - x1) / (y3 - y1)
-        slope2 = (x3 - x2) / (y3 - y2)
+        slope1 = (x3 - x2) / (y3 - y2)
+        slope2 = (x3 - x1) / (y3 - y1)
 
         xo1 = xo2 = x3
-
-        for yo in range(int(y3), int(y1), -1):
+        for yo in range(int(y3), int(y2), -1):
             draw_line(win, xo1, yo, xo2, yo, val)
             xo1 -= slope1
             xo2 -= slope2
@@ -188,25 +186,25 @@ def draw_cube(win: tr.Window, x, y, z, xo, yo, zo, rx, ry, rz, val):
         [(-x, y, -z), (x, y, -z), (x, -y, -z)],
         [(-x, y, -z), (x, -y, -z), (-x, -y, -z)],
 
-        # back
-        [(-x, y, z), (x, y, z), (x, -y, z)],
-        [(-x, y, z), (x, -y, z), (-x, -y, z)],
-
-        # left
-        [(-x, y, -z), (-x, y, z), (-x, -y, z)],
-        [(-x, y, -z), (-x, -y, z), (-x, -y, -z)],
-
-        # right
-        [(x, y, -z), (x, y, z), (x, -y, z)],
-        [(x, y, -z), (x, -y, z), (x, -y, -z)],
-
-        # top
-        [(-x, y, z), (x, y, z), (x, y, -z)],
-        [(-x, y, z), (x, y, -z), (-x, y, -z)],
-
-        # bottom
-        [(-x, -y, z), (x, -y, z), (x, -y, -z)],
-        [(-x, -y, z), (x, -y, -z), (-x, -y, -z)],
+        # # back
+        # [(-x, y, z), (x, y, z), (x, -y, z)],
+        # [(-x, y, z), (x, -y, z), (-x, -y, z)],
+        #
+        # # left
+        # [(-x, y, -z), (-x, y, z), (-x, -y, z)],
+        # [(-x, y, -z), (-x, -y, z), (-x, -y, -z)],
+        #
+        # # right
+        # [(x, y, -z), (x, y, z), (x, -y, z)],
+        # [(x, y, -z), (x, -y, z), (x, -y, -z)],
+        #
+        # # top
+        # [(-x, y, z), (x, y, z), (x, y, -z)],
+        # [(-x, y, z), (x, y, -z), (-x, y, -z)],
+        #
+        # # bottom
+        # [(-x, -y, z), (x, -y, z), (x, -y, -z)],
+        # [(-x, -y, z), (x, -y, -z), (-x, -y, -z)],
     ]
 
     w, h = win.width // 2, win.height // 2
@@ -234,7 +232,7 @@ def main():
     win.initialize(tr.Mode.palette8)
     count = 0
     while True:
-        draw_cube(win, 10, 10, 10, 0, 0, 30, count/30, count/30, count/30, 1)
+        draw_cube(win, 10, 10, 10, 0, 0, 30, 0, count/30, 0, 1)
         win.update()
         win.clear()
         count += 1
