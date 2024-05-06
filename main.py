@@ -107,9 +107,9 @@ def draw_filled(win: tr.Window, x1, y1, x2, y2, x3, y3, val):
 def project_xyz(x, y, z) -> tuple[float, float]:
     """
     Simple projection method
-    :param x: point coord
-    :param y: point coord
-    :param z: point coord
+    :param x: point x
+    :param y: point y
+    :param z: point z
     :return: x, y coords
     """
 
@@ -172,6 +172,10 @@ def draw_cube(win: tr.Window, x, y, z, xo, yo, zo, rx, ry, rz, val):
     """
 
     polys = [
+        # front
+        [(-x, y, -z), (x, y, -z), (x, -y, -z)],
+        [(-x, y, -z), (x, -y, -z), (-x, -y, -z)],
+
         # back
         [(-x, y, z), (x, y, z), (x, -y, z)],
         [(-x, y, z), (x, -y, z), (-x, -y, z)],
@@ -191,10 +195,6 @@ def draw_cube(win: tr.Window, x, y, z, xo, yo, zo, rx, ry, rz, val):
         # bottom
         [(-x, -y, z), (x, -y, z), (x, -y, -z)],
         [(-x, -y, z), (x, -y, -z), (-x, -y, -z)],
-
-        # front
-        [(-x, y, -z), (x, y, -z), (x, -y, -z)],
-        [(-x, y, -z), (x, -y, -z), (-x, -y, -z)],
     ]
 
     w, h = win.width // 2, win.height // 2
