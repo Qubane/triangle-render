@@ -187,25 +187,25 @@ def draw_cube(win: tr.Window, x, y, z, xo, yo, zo, rx, ry, rz, val):
         [(-x, y, -z), (x, y, -z), (x, -y, -z)],
         [(-x, y, -z), (x, -y, -z), (-x, -y, -z)],
 
-        # # back
-        # [(-x, y, z), (x, y, z), (x, -y, z)],
-        # [(-x, y, z), (x, -y, z), (-x, -y, z)],
-        #
-        # # left
-        # [(-x, y, -z), (-x, y, z), (-x, -y, z)],
-        # [(-x, y, -z), (-x, -y, z), (-x, -y, -z)],
-        #
-        # # right
-        # [(x, y, -z), (x, y, z), (x, -y, z)],
-        # [(x, y, -z), (x, -y, z), (x, -y, -z)],
-        #
-        # # top
-        # [(-x, y, z), (x, y, z), (x, y, -z)],
-        # [(-x, y, z), (x, y, -z), (-x, y, -z)],
-        #
-        # # bottom
-        # [(-x, -y, z), (x, -y, z), (x, -y, -z)],
-        # [(-x, -y, z), (x, -y, -z), (-x, -y, -z)],
+        # back
+        [(-x, y, z), (x, y, z), (x, -y, z)],
+        [(-x, y, z), (x, -y, z), (-x, -y, z)],
+
+        # left
+        [(-x, y, -z), (-x, y, z), (-x, -y, z)],
+        [(-x, y, -z), (-x, -y, z), (-x, -y, -z)],
+
+        # right
+        [(x, y, -z), (x, y, z), (x, -y, z)],
+        [(x, y, -z), (x, -y, z), (x, -y, -z)],
+
+        # top
+        [(-x, y, z), (x, y, z), (x, y, -z)],
+        [(-x, y, z), (x, y, -z), (-x, y, -z)],
+
+        # bottom
+        [(-x, -y, z), (x, -y, z), (x, -y, -z)],
+        [(-x, -y, z), (x, -y, -z), (-x, -y, -z)],
     ]
 
     w, h = win.width // 2, win.height // 2
@@ -233,7 +233,7 @@ def main():
     win.initialize(tr.Mode.palette8)
     count = 0
     while True:
-        draw_cube(win, 10, 10, 10, 0, 0, 30, 0, count/30, 0, 1)
+        draw_cube(win, 10, 10, 10, 0, 0, 30, count/30, count/30, count/30, 1)
         win.update()
         win.clear()
         count += 1
