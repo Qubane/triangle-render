@@ -1,7 +1,14 @@
 import math
 import termrender as tr
 from time import sleep
-from random import random
+
+
+# 3d rendering
+MESH = []
+
+# window
+WIN = tr.Window()
+WIN.initialize(tr.Mode.palette8)
 
 
 def draw_line(win: tr.Window, x1, y1, x2, y2, val):
@@ -166,10 +173,9 @@ def rotate_z(x, y, z, angle) -> tuple[float, float, float]:
     return x * math.cos(angle) - y * math.sin(angle), y * math.cos(angle) + x * math.sin(angle), z
 
 
-def draw_cube(win: tr.Window, x, y, z, xo, yo, zo, rx, ry, rz, val):
+def draw_cube(x, y, z, xo, yo, zo, rx, ry, rz):
     """
     Draws a cube
-    :param win: window
     :param x: pos x
     :param y: pos y
     :param z: pos z
@@ -207,35 +213,60 @@ def draw_cube(win: tr.Window, x, y, z, xo, yo, zo, rx, ry, rz, val):
         [(-x, -y, z), (x, -y, z), (x, -y, -z)],
         [(-x, -y, z), (x, -y, -z), (-x, -y, -z)],
     ]
+    for poly in polys:
+        transformed_poly = []
 
-    w, h = win.width // 2, win.height // 2
-    for idx, poly in enumerate(polys):
         x, y, z = rotate_x(poly[0][0], poly[0][1], poly[0][2], rx)
         x, y, z = rotate_y(x, y, z, ry)
         x, y, z = rotate_y(x, y, z, rz)
-        x1, y1 = project_xyz(x + xo, y + yo, z + zo)
+        transformed_poly.append((x + xo, y + yo, z + zo))
 
         x, y, z = rotate_x(poly[1][0], poly[1][1], poly[1][2], rx)
         x, y, z = rotate_y(x, y, z, ry)
         x, y, z = rotate_y(x, y, z, rz)
-        x2, y2 = project_xyz(x + xo, y + yo, z + zo)
+        transformed_poly.append((x + xo, y + yo, z + zo))
 
         x, y, z = rotate_x(poly[2][0], poly[2][1], poly[2][2], rx)
         x, y, z = rotate_y(x, y, z, ry)
         x, y, z = rotate_y(x, y, z, rz)
-        x3, y3 = project_xyz(x + xo, y + yo, z + zo)
+        transformed_poly.append((x + xo, y + yo, z + zo))
 
-        draw_filled(win, x1 + w, y1 + h, x2 + w, y2 + h, x3 + w, y3 + h, idx + 1)
+        # sort poly's vertices by Z coord
+        transformed_poly.sort(key=lambda coord: coord[2], reverse=True)
+
+        MESH.append(transformed_poly)
+
+
+def render_mesh():
+    """
+    Renders scene mesh
+    """
+
+    # sort everything
+    # sort by first vertex, which would be the smallest
+    MESH.sort(key=lambda x: x[0][2], reverse=True)
+
+    # screen centering (to make 0, 0 in the middle)
+    hw, hh = WIN.width // 2, WIN.height // 2
+
+    # render
+    for idx, poly in enumerate(MESH):
+        x1, y1 = project_xyz(poly[0][0], poly[0][1], poly[0][2])
+        x2, y2 = project_xyz(poly[1][0], poly[1][1], poly[1][2])
+        x3, y3 = project_xyz(poly[2][0], poly[2][1], poly[2][2])
+        draw_filled(WIN, x1 + hw, y1 + hh, x2 + hw, y2 + hh, x3 + hw, y3 + hh, idx % len(WIN.palette))
+
+    # clear mesh
+    MESH.clear()
 
 
 def main():
-    win = tr.Window()
-    win.initialize(tr.Mode.palette8)
     count = 0
     while True:
-        draw_cube(win, 10, 10, 10, 0, 0, 30, count/30, count/30, count/30, 1)
-        win.update()
-        win.clear()
+        draw_cube(10, 10, 10, 0, 0, 30, count/30, count/30, count/30)
+        render_mesh()
+        WIN.update()
+        WIN.clear()
         count += 1
         sleep(0.0333)
 
