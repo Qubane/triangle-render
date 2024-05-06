@@ -1,3 +1,4 @@
+import math
 import termrender as tr
 from time import sleep
 from random import random
@@ -81,8 +82,8 @@ def draw_filled(win: tr.Window, x1, y1, x2, y2, x3, y3, val):
         x3, y3, x2, y2 = x2, y2, x3, y3
 
     # fill top triangle
-    slope1 = (x2 - x1) / (y2 - y1)
-    slope2 = (x3 - x1) / (y3 - y1)
+    slope1 = (x2 - x1) / (y2 - y1) if y2 - y1 != 0 else 0
+    slope2 = (x3 - x1) / (y3 - y1) if y3 - y1 != 0 else 0
 
     xo1 = xo2 = x1
 
@@ -92,8 +93,8 @@ def draw_filled(win: tr.Window, x1, y1, x2, y2, x3, y3, val):
         draw_line(win, xo1, yo, xo2, yo, val)
 
     # fill bottom triangle
-    slope1 = (x3 - x1) / (y3 - y1)
-    slope2 = (x3 - x2) / (y3 - y2)
+    slope1 = (x3 - x1) / (y3 - y1) if y3 - y1 != 0 else 0
+    slope2 = (x3 - x2) / (y3 - y2) if y3 - y2 != 0 else 0
 
     xo1 = xo2 = x3
 
@@ -103,19 +104,79 @@ def draw_filled(win: tr.Window, x1, y1, x2, y2, x3, y3, val):
         draw_line(win, xo1, yo, xo2, yo, val)
 
 
+def project_xyz(x, y, z) -> tuple[float, float]:
+    return x / z * 80, y / z * 80
+
+
+def rotate_x(x, y, z, angle):
+    return x, y * math.cos(angle) - z * math.sin(angle), z * math.cos(angle) + y * math.sin(angle)
+
+
+def rotate_y(x, y, z, angle):
+    return x * math.cos(angle) - z * math.sin(angle), y, z * math.cos(angle) + x * math.sin(angle)
+
+
+def rotate_z(x, y, z, angle):
+    return x * math.cos(angle) - y * math.sin(angle), y * math.cos(angle) + x * math.sin(angle), z
+
+
+def draw_cube(win: tr.Window, x, y, z, xo, yo, zo, rx, ry, rz, val):
+    polys = [
+        # back
+        [(-x, y, z), (x, y, z), (x, -y, z)],
+        [(-x, y, z), (x, -y, z), (-x, -y, z)],
+
+        # left
+        [(-x, y, -z), (-x, y, z), (-x, -y, z)],
+        [(-x, y, -z), (-x, -y, z), (-x, -y, -z)],
+
+        # right
+        [(x, y, -z), (x, y, z), (x, -y, z)],
+        [(x, y, -z), (x, -y, z), (x, -y, -z)],
+
+        # top
+        [(-x, y, z), (x, y, z), (x, y, -z)],
+        [(-x, y, z), (x, y, -z), (-x, y, -z)],
+
+        # bottom
+        [(-x, -y, z), (x, -y, z), (x, -y, -z)],
+        [(-x, -y, z), (x, -y, -z), (-x, -y, -z)],
+
+        # front
+        [(-x, y, -z), (x, y, -z), (x, -y, -z)],
+        [(-x, y, -z), (x, -y, -z), (-x, -y, -z)],
+    ]
+
+    w, h = win.width // 2, win.height // 2
+    for idx, poly in enumerate(polys):
+        x, y, z = rotate_x(poly[0][0], poly[0][1], poly[0][2], rx)
+        x, y, z = rotate_y(x, y, z, ry)
+        x, y, z = rotate_y(x, y, z, rz)
+        x1, y1 = project_xyz(x + xo, y + yo, z + zo)
+
+        x, y, z = rotate_x(poly[1][0], poly[1][1], poly[1][2], rx)
+        x, y, z = rotate_y(x, y, z, ry)
+        x, y, z = rotate_y(x, y, z, rz)
+        x2, y2 = project_xyz(x + xo, y + yo, z + zo)
+
+        x, y, z = rotate_x(poly[2][0], poly[2][1], poly[2][2], rx)
+        x, y, z = rotate_y(x, y, z, ry)
+        x, y, z = rotate_y(x, y, z, rz)
+        x3, y3 = project_xyz(x + xo, y + yo, z + zo)
+
+        draw_outline(win, x1 + w, y1 + h, x2 + w, y2 + h, x3 + w, y3 + h, idx + 1)
+
+
 def main():
     win = tr.Window()
     win.initialize(tr.Mode.palette8)
+    count = 0
     while True:
+        draw_cube(win, 10, 10, 10, 0, 0, 100, count/30, count/30, count/30, 1)
         win.update()
-        draw_filled(
-            win,
-            random() * win.width, random() * win.height,
-            random() * win.width, random() * win.height,
-            random() * win.width, random() * win.height,
-            int(random() * 256)
-        )
-        sleep(0.5)
+        win.clear()
+        count += 1
+        sleep(0.0333)
 
 
 if __name__ == '__main__':
