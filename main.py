@@ -22,6 +22,10 @@ def draw_line(win: tr.Window, x1, y1, x2, y2, val):
     dx = x2 - x1
     dy = y2 - y1
 
+    # if deltas are both 0, then return
+    if dx == dy == 0:
+        return
+
     # calculate biggest delta, and steps
     if abs(dx) > abs(dy):
         length = abs(dx)
@@ -81,27 +85,35 @@ def draw_filled(win: tr.Window, x1, y1, x2, y2, x3, y3, val):
     if y3 < y2:
         x3, y3, x2, y2 = x2, y2, x3, y3
 
-    # fill top triangle
-    slope1 = (x2 - x1) / (y2 - y1) if y2 - y1 != 0 else 0
-    slope2 = (x3 - x1) / (y3 - y1) if y3 - y1 != 0 else 0
+    # triangle has no height
+    if y1 - y3 == 0:
+        return
 
-    xo1 = xo2 = x1
+    # check for top-flat triangle
+    if y1 - y2 != 0:
+        # fill top triangle
+        slope1 = (x2 - x1) / (y2 - y1)
+        slope2 = (x3 - x1) / (y3 - y1)
 
-    for yo in range(int(y1), int(y2)):
-        xo1 += slope1
-        xo2 += slope2
-        draw_line(win, xo1, yo, xo2, yo, val)
+        xo1 = xo2 = x1
 
-    # fill bottom triangle
-    slope1 = (x3 - x1) / (y3 - y1) if y3 - y1 != 0 else 0
-    slope2 = (x3 - x2) / (y3 - y2) if y3 - y2 != 0 else 0
+        for yo in range(int(y1), int(y2)):
+            draw_line(win, xo1, yo, xo2, yo, val)
+            xo1 += slope1
+            xo2 += slope2
 
-    xo1 = xo2 = x3
+    # check for bottom-flat triangle
+    if y2 - y3 != 0:
+        # fill bottom triangle
+        slope1 = (x3 - x1) / (y3 - y1)
+        slope2 = (x3 - x2) / (y3 - y2)
 
-    for yo in range(int(y3), int(y1), -1):
-        xo1 -= slope1
-        xo2 -= slope2
-        draw_line(win, xo1, yo, xo2, yo, val)
+        xo1 = xo2 = x3
+
+        for yo in range(int(y3), int(y1), -1):
+            draw_line(win, xo1, yo, xo2, yo, val)
+            xo1 -= slope1
+            xo2 -= slope2
 
 
 def project_xyz(x, y, z) -> tuple[float, float]:
@@ -214,7 +226,7 @@ def draw_cube(win: tr.Window, x, y, z, xo, yo, zo, rx, ry, rz, val):
         x, y, z = rotate_y(x, y, z, rz)
         x3, y3 = project_xyz(x + xo, y + yo, z + zo)
 
-        draw_outline(win, x1 + w, y1 + h, x2 + w, y2 + h, x3 + w, y3 + h, idx + 1)
+        draw_filled(win, x1 + w, y1 + h, x2 + w, y2 + h, x3 + w, y3 + h, idx + 1)
 
 
 def main():
@@ -222,7 +234,7 @@ def main():
     win.initialize(tr.Mode.palette8)
     count = 0
     while True:
-        draw_cube(win, 10, 10, 10, 0, 0, 100, count/30, count/30, count/30, 1)
+        draw_cube(win, 10, 10, 10, 0, 0, 30, count/30, count/30, count/30, 1)
         win.update()
         win.clear()
         count += 1
