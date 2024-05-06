@@ -89,14 +89,16 @@ def draw_filled(win: tr.Window, x1, y1, x2, y2, x3, y3, val):
     if y1 - y3 == 0:
         return
 
+    # calculate second slope
+    slope2 = (x3 - x1) / (y3 - y1)
+
     # check for top-flat triangle
     if y1 - y2 != 0:
         # fill top triangle
         slope1 = (x2 - x1) / (y2 - y1)
-        slope2 = (x3 - x1) / (y3 - y1)
 
         xo1 = xo2 = x1
-        for yo in range(int(y1), int(y2)):
+        for yo in range(int(y1), int(y2)+1):
             draw_line(win, xo1, yo, xo2, yo, val)
             xo1 += slope1
             xo2 += slope2
@@ -105,7 +107,6 @@ def draw_filled(win: tr.Window, x1, y1, x2, y2, x3, y3, val):
     if y2 - y3 != 0:
         # fill bottom triangle
         slope1 = (x3 - x2) / (y3 - y2)
-        slope2 = (x3 - x1) / (y3 - y1)
 
         xo1 = xo2 = x3
         for yo in range(int(y3), int(y2), -1):
