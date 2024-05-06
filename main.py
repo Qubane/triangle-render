@@ -105,22 +105,72 @@ def draw_filled(win: tr.Window, x1, y1, x2, y2, x3, y3, val):
 
 
 def project_xyz(x, y, z) -> tuple[float, float]:
+    """
+    Simple projection method
+    :param x: point coord
+    :param y: point coord
+    :param z: point coord
+    :return: x, y coords
+    """
+
     return x / z * 80, y / z * 80
 
 
-def rotate_x(x, y, z, angle):
+def rotate_x(x, y, z, angle) -> tuple[float, float, float]:
+    """
+    Rotates a point around X axis
+    :param x: point x
+    :param y: point y
+    :param z: point z
+    :param angle: angles (radians)
+    :return: tuple which contains rotated point
+    """
+
     return x, y * math.cos(angle) - z * math.sin(angle), z * math.cos(angle) + y * math.sin(angle)
 
 
-def rotate_y(x, y, z, angle):
+def rotate_y(x, y, z, angle) -> tuple[float, float, float]:
+    """
+    Rotates a point around Y axis
+    :param x: point x
+    :param y: point y
+    :param z: point z
+    :param angle: angles (radians)
+    :return: tuple which contains rotated point
+    """
+
     return x * math.cos(angle) - z * math.sin(angle), y, z * math.cos(angle) + x * math.sin(angle)
 
 
-def rotate_z(x, y, z, angle):
+def rotate_z(x, y, z, angle) -> tuple[float, float, float]:
+    """
+    Rotates a point around Z axis
+    :param x: point x
+    :param y: point y
+    :param z: point z
+    :param angle: angles (radians)
+    :return: tuple which contains rotated point
+    """
+
     return x * math.cos(angle) - y * math.sin(angle), y * math.cos(angle) + x * math.sin(angle), z
 
 
 def draw_cube(win: tr.Window, x, y, z, xo, yo, zo, rx, ry, rz, val):
+    """
+    Draws a cube
+    :param win: window
+    :param x: pos x
+    :param y: pos y
+    :param z: pos z
+    :param xo: x offset
+    :param yo: y offset
+    :param zo: z offset
+    :param rx: x rotation
+    :param ry: y rotation
+    :param rz: z rotation
+    :param val: value
+    """
+
     polys = [
         # back
         [(-x, y, z), (x, y, z), (x, -y, z)],
