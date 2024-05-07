@@ -185,9 +185,70 @@ def rotate_z(x, y, z, angle) -> tuple[float, float, float]:
     return x * math.cos(angle) - y * math.sin(angle), y * math.cos(angle) + x * math.sin(angle), z
 
 
+def append_transformed_poly(poly, xo, yo, zo, rx, ry, rz):
+    """
+    Appends polygons to MESH
+    :param poly:
+    :param xo:
+    :param yo:
+    :param zo:
+    :param rx:
+    :param ry:
+    :param rz:
+    """
+
+    transformed_poly = []
+
+    x, y, z = rotate_x(poly[0][0], poly[0][1], poly[0][2], rx)
+    x, y, z = rotate_y(x, y, z, ry)
+    x, y, z = rotate_y(x, y, z, rz)
+    transformed_poly.append((x + xo, y + yo, z + zo))
+
+    x, y, z = rotate_x(poly[1][0], poly[1][1], poly[1][2], rx)
+    x, y, z = rotate_y(x, y, z, ry)
+    x, y, z = rotate_y(x, y, z, rz)
+    if z + zo > transformed_poly[0][2]:
+        transformed_poly.insert(0, (x + xo, y + yo, z + zo))
+    else:
+        transformed_poly.append((x + xo, y + yo, z + zo))
+
+    x, y, z = rotate_x(poly[2][0], poly[2][1], poly[2][2], rx)
+    x, y, z = rotate_y(x, y, z, ry)
+    x, y, z = rotate_y(x, y, z, rz)
+    if z + zo > transformed_poly[0][2]:
+        transformed_poly.insert(0, (x + xo, y + yo, z + zo))
+    elif z + zo > transformed_poly[1][2]:
+        transformed_poly.insert(1, (x + xo, y + yo, z + zo))
+    else:
+        transformed_poly.append((x + xo, y + yo, z + zo))
+
+    MESH.append(transformed_poly)
+
+
+def make_plane(x, y, xo, yo, zo, rx, ry, rz):
+    """
+    Generates a plane mesh
+    :param x: pos x
+    :param y: pos y
+    :param xo: x offset
+    :param yo: y offset
+    :param zo: z offset
+    :param rx: x rotation
+    :param ry: y rotation
+    :param rz: z rotation
+    """
+
+    polys = [
+        [(-x, 0, y), (x, 0, y), (x, 0, -y)],
+        [(-x, 0, y), (x, 0, -y), (-x, 0, -y)]
+    ]
+    for poly in polys:
+        append_transformed_poly(poly, xo, yo, zo, rx, ry, rz)
+
+
 def make_cube(x, y, z, xo, yo, zo, rx, ry, rz):
     """
-    Draws a cube
+    Generates a cube mesh
     :param x: pos x
     :param y: pos y
     :param z: pos z
@@ -225,32 +286,7 @@ def make_cube(x, y, z, xo, yo, zo, rx, ry, rz):
         [(-x, -y, z), (x, -y, -z), (-x, -y, -z)],
     ]
     for poly in polys:
-        transformed_poly = []
-
-        x, y, z = rotate_x(poly[0][0], poly[0][1], poly[0][2], rx)
-        x, y, z = rotate_y(x, y, z, ry)
-        x, y, z = rotate_y(x, y, z, rz)
-        transformed_poly.append((x + xo, y + yo, z + zo))
-
-        x, y, z = rotate_x(poly[1][0], poly[1][1], poly[1][2], rx)
-        x, y, z = rotate_y(x, y, z, ry)
-        x, y, z = rotate_y(x, y, z, rz)
-        if z + zo > transformed_poly[0][2]:
-            transformed_poly.insert(0, (x + xo, y + yo, z + zo))
-        else:
-            transformed_poly.append((x + xo, y + yo, z + zo))
-
-        x, y, z = rotate_x(poly[2][0], poly[2][1], poly[2][2], rx)
-        x, y, z = rotate_y(x, y, z, ry)
-        x, y, z = rotate_y(x, y, z, rz)
-        if z + zo > transformed_poly[0][2]:
-            transformed_poly.insert(0, (x + xo, y + yo, z + zo))
-        elif z + zo > transformed_poly[1][2]:
-            transformed_poly.insert(1, (x + xo, y + yo, z + zo))
-        else:
-            transformed_poly.append((x + xo, y + yo, z + zo))
-
-        MESH.append(transformed_poly)
+        append_transformed_poly(poly, xo, yo, zo, rx, ry, rz)
 
 
 def render_mesh():
@@ -263,12 +299,18 @@ def render_mesh():
     MESH.sort(key=lambda x: x[0][2], reverse=True)
 
     # clipping
-    for idx, poly in enumerate(MESH):
+    idx = 0
+    while idx < len(MESH):
+        # fetch poly
+        poly = MESH[idx]
+
         # ignore mesh that is fully behind the camera
         if poly[0][2] < 0 and poly[1][2] < 0 and poly[2][2] < 0:
             continue
 
+        # figure something out
 
+        idx += 1
 
     # screen centering (to make 0, 0 in the middle)
     hw, hh = WIN.width // 2, WIN.height // 2
@@ -285,7 +327,7 @@ def render_mesh():
         x3, y3 = project_xyz(poly[2][0], poly[2][1], poly[2][2])
 
         # plot the triangle
-        draw_outline(WIN, x1 + hw, y1 + hh, x2 + hw, y2 + hh, x3 + hw, y3 + hh, (idx + 1) % len(WIN.palette))
+        draw_filled(WIN, x1 + hw, y1 + hh, x2 + hw, y2 + hh, x3 + hw, y3 + hh, (idx + 1) % len(WIN.palette))
 
     # clear mesh
     MESH.clear()
@@ -294,7 +336,7 @@ def render_mesh():
 def main():
     count = 0
     while True:
-        make_cube(10, 10, 10, 0, 0, 100, count / 50, count / 50, count / 50)
+        make_plane(50, 50, 0, 0, 20, count / 50, count / 50, count / 50)
         render_mesh()
         WIN.update()
         WIN.clear()
