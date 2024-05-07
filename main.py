@@ -337,7 +337,7 @@ def render_mesh():
         x3, y3 = project_xyz(poly[2][0], poly[2][1], poly[2][2])
 
         # plot the triangle
-        draw_outline(WIN, x1 + hw, y1 + hh, x2 + hw, y2 + hh, x3 + hw, y3 + hh, (idx + 1) % len(WIN.palette))
+        draw_filled(WIN, x1 + hw, y1 + hh, x2 + hw, y2 + hh, x3 + hw, y3 + hh, (idx + 1) % len(WIN.palette))
 
     # clear mesh
     MESH.clear()
@@ -346,12 +346,12 @@ def render_mesh():
 def main():
     count = 0
     while True:
-        make_plane(40, 40, 0, 40, 40, 3.2, count / 50, 0)
-        # make_cube(10, 10, 10, 0, 0, 40, count/50, count/50, count/50)
+        # make_plane(40, 40, 0, 40, 40, 3.2, count / 50, 0)
+        make_cube(10, 10, 10, 0, 0, 100, count/50, count/50, count/50)
         render_mesh()
         WIN.update()
         WIN.clear()
-        # count += 1
+        count += 1
         sleep(0.0333)
 
 
