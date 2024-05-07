@@ -202,25 +202,28 @@ def append_transformed_poly(poly, xo, yo, zo, rx, ry, rz):
     x, y, z = rotate_x(poly[0][0], poly[0][1], poly[0][2], rx)
     x, y, z = rotate_y(x, y, z, ry)
     x, y, z = rotate_y(x, y, z, rz)
-    transformed_poly.append((x + xo, y + yo, z + zo))
+    vertex = (x + xo, y + yo, z + zo)
+    transformed_poly.append(vertex)
 
     x, y, z = rotate_x(poly[1][0], poly[1][1], poly[1][2], rx)
     x, y, z = rotate_y(x, y, z, ry)
     x, y, z = rotate_y(x, y, z, rz)
+    vertex = (x + xo, y + yo, z + zo)
     if z + zo > transformed_poly[0][2]:
-        transformed_poly.insert(0, (x + xo, y + yo, z + zo))
+        transformed_poly.insert(0, vertex)
     else:
-        transformed_poly.append((x + xo, y + yo, z + zo))
+        transformed_poly.append(vertex)
 
     x, y, z = rotate_x(poly[2][0], poly[2][1], poly[2][2], rx)
     x, y, z = rotate_y(x, y, z, ry)
     x, y, z = rotate_y(x, y, z, rz)
+    vertex = (x + xo, y + yo, z + zo)
     if z + zo > transformed_poly[0][2]:
-        transformed_poly.insert(0, (x + xo, y + yo, z + zo))
+        transformed_poly.insert(0, vertex)
     elif z + zo > transformed_poly[1][2]:
-        transformed_poly.insert(1, (x + xo, y + yo, z + zo))
+        transformed_poly.insert(1, vertex)
     else:
-        transformed_poly.append((x + xo, y + yo, z + zo))
+        transformed_poly.append(vertex)
 
     MESH.append(transformed_poly)
 
@@ -295,8 +298,7 @@ def render_mesh():
     """
 
     # sort everything
-    # sort by first vertex, which would be the smallest
-    MESH.sort(key=lambda x: x[0][2], reverse=True)
+    MESH.sort(key=lambda x: (x[0][2]+x[1][2]+x[2][2])/3, reverse=True)
 
     # clipping
     idx = 0
@@ -305,10 +307,22 @@ def render_mesh():
         poly = MESH[idx]
 
         # ignore mesh that is fully behind the camera
-        if poly[0][2] < 0 and poly[1][2] < 0 and poly[2][2] < 0:
+        if poly[0][2] < NEAR_CLIP and poly[1][2] < NEAR_CLIP and poly[2][2] < NEAR_CLIP:
+            idx += 1
             continue
 
-        # figure something out
+        # ignore mesh that is fully in front of camera
+        if poly[0][2] >= NEAR_CLIP and poly[1][2] >= NEAR_CLIP and poly[2][2] >= NEAR_CLIP:
+            idx += 1
+            continue
+
+        # 2 vertices in front
+        if poly[0][2] >= NEAR_CLIP and poly[1][2] >= NEAR_CLIP and poly[2][2] < NEAR_CLIP:
+            pass
+
+        # 1 vertex in front
+        if poly[0][2] >= NEAR_CLIP and poly[1][2] < NEAR_CLIP and poly[2][2] < NEAR_CLIP:
+            pass
 
         idx += 1
 
@@ -318,7 +332,7 @@ def render_mesh():
     # render
     for idx, poly in enumerate(MESH):
         # ignore mesh that is fully behind the camera
-        if poly[0][2] < 0 and poly[1][2] < 0 and poly[2][2] < 0:
+        if poly[0][2] < NEAR_CLIP and poly[1][2] < NEAR_CLIP and poly[2][2] < NEAR_CLIP:
             continue
 
         # calculate projected points
@@ -336,7 +350,8 @@ def render_mesh():
 def main():
     count = 0
     while True:
-        make_plane(50, 50, 0, 0, 20, count / 50, count / 50, count / 50)
+        # make_plane(40, 40, 0, 40, 100, 3.2, count / 50, 0)
+        make_cube(10, 10, 10, 0, 0, 40, count/50, count/50, count/50)
         render_mesh()
         WIN.update()
         WIN.clear()
