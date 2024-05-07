@@ -44,7 +44,7 @@ def draw_line(win: tr.Window, x1, y1, x2, y2, val):
         sy = 1 if dy > 0 else -1
 
     # plot the pixels
-    for _ in range(int(length)):
+    for _ in range(int(length+0.99)):
         # plot pixel
         win.plot(int(x1), int(y1), val)
 
@@ -105,7 +105,7 @@ def draw_filled(win: tr.Window, x1, y1, x2, y2, x3, y3, val):
         slope1 = (x2 - x1) / (y2 - y1)
 
         xo1 = xo2 = x1
-        for yo in range(int(y1), int(y2)+1):
+        for yo in range(int(y1), int(y2)):
             draw_line(win, xo1, yo, xo2, yo, val)
             xo1 += slope1
             xo2 += slope2
@@ -173,7 +173,7 @@ def rotate_z(x, y, z, angle) -> tuple[float, float, float]:
     return x * math.cos(angle) - y * math.sin(angle), y * math.cos(angle) + x * math.sin(angle), z
 
 
-def draw_cube(x, y, z, xo, yo, zo, rx, ry, rz):
+def make_cube(x, y, z, xo, yo, zo, rx, ry, rz):
     """
     Draws a cube
     :param x: pos x
@@ -268,7 +268,7 @@ def render_mesh():
 def main():
     count = 0
     while True:
-        draw_cube(10, 10, 10, 0, 0, 30, count/30, count/30, count/30)
+        make_cube(10, 10, 10, 0, 0, 30, count / 50, count / 50, count / 50)
         render_mesh()
         WIN.update()
         WIN.clear()
