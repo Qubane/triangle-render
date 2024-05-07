@@ -92,6 +92,9 @@ def draw_filled(win: tr.Window, x1, y1, x2, y2, x3, y3, val):
     if y3 < y2:
         x3, y3, x2, y2 = x2, y2, x3, y3
 
+    minx = min(x1, x2, x3)
+    maxx = max(x1, x2, x3)
+
     # triangle has no height
     if y1 - y3 == 0:
         return
@@ -105,10 +108,14 @@ def draw_filled(win: tr.Window, x1, y1, x2, y2, x3, y3, val):
         slope1 = (x2 - x1) / (y2 - y1)
 
         xo1 = xo2 = x1
-        for yo in range(int(y1), int(y2)):
+        for yo in range(int(y1), int(y2)+1):
             draw_line(win, xo1, yo, xo2, yo, val)
             xo1 += slope1
             xo2 += slope2
+            if minx > xo1 or xo1 > maxx:
+                xo1 = minx if xo1 < minx else maxx
+            if minx > xo2 or xo2 > maxx:
+                xo2 = minx if xo2 < minx else maxx
 
     # check for bottom-flat triangle
     if y2 - y3 != 0:
@@ -116,10 +123,14 @@ def draw_filled(win: tr.Window, x1, y1, x2, y2, x3, y3, val):
         slope1 = (x3 - x2) / (y3 - y2)
 
         xo1 = xo2 = x3
-        for yo in range(int(y3), int(y2), -1):
+        for yo in range(int(y3), int(y2)-1, -1):
             draw_line(win, xo1, yo, xo2, yo, val)
             xo1 -= slope1
             xo2 -= slope2
+            if xo1 < minx or xo1 > maxx:
+                xo1 = minx if xo1 < minx else maxx
+            if xo1 < minx or xo2 > maxx:
+                xo2 = minx if xo2 < minx else maxx
 
 
 def project_xyz(x, y, z) -> tuple[float, float]:
@@ -131,7 +142,7 @@ def project_xyz(x, y, z) -> tuple[float, float]:
     :return: x, y coords
     """
 
-    return x / z * 80, y / z * 80
+    return x / z * 100, y / z * 100
 
 
 def rotate_x(x, y, z, angle) -> tuple[float, float, float]:
@@ -185,7 +196,6 @@ def make_cube(x, y, z, xo, yo, zo, rx, ry, rz):
     :param rx: x rotation
     :param ry: y rotation
     :param rz: z rotation
-    :param val: value
     """
 
     polys = [
@@ -259,7 +269,7 @@ def render_mesh():
         x1, y1 = project_xyz(poly[0][0], poly[0][1], poly[0][2])
         x2, y2 = project_xyz(poly[1][0], poly[1][1], poly[1][2])
         x3, y3 = project_xyz(poly[2][0], poly[2][1], poly[2][2])
-        draw_filled(WIN, x1 + hw, y1 + hh, x2 + hw, y2 + hh, x3 + hw, y3 + hh, idx % len(WIN.palette))
+        draw_filled(WIN, x1 + hw, y1 + hh, x2 + hw, y2 + hh, x3 + hw, y3 + hh, (idx + 1) % len(WIN.palette))
 
     # clear mesh
     MESH.clear()
@@ -268,7 +278,7 @@ def render_mesh():
 def main():
     count = 0
     while True:
-        make_cube(10, 10, 10, 0, 0, 30, count / 50, count / 50, count / 50)
+        make_cube(10, 10, 10, 0, 0, 100, count / 50, count / 50, count / 50)
         render_mesh()
         WIN.update()
         WIN.clear()
