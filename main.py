@@ -109,14 +109,10 @@ def draw_filled(win: tr.Window, x1, y1, x2, y2, x3, y3, val):
         slope1 = (x2 - x1) / (y2 - y1)
 
         xo1 = xo2 = x1
-        for yo in range(int(y1), int(y2)+1):
+        for yo in range(int(y1), int(y2)):
             draw_line(win, xo1, yo, xo2, yo, val)
             xo1 += slope1
             xo2 += slope2
-            if minx > xo1 or xo1 > maxx:
-                xo1 = minx if xo1 < minx else maxx
-            if minx > xo2 or xo2 > maxx:
-                xo2 = minx if xo2 < minx else maxx
 
     # check for bottom-flat triangle
     if y2 - y3 != 0:
@@ -350,8 +346,8 @@ def render_mesh():
 def main():
     count = 0
     while True:
-        # make_plane(40, 40, 0, 40, 100, 3.2, count / 50, 0)
-        make_cube(10, 10, 10, 0, 0, 40, count/50, count/50, count/50)
+        make_plane(40, 40, 0, 40, 100, 3.2, count / 50, 0)
+        # make_cube(10, 10, 10, 0, 0, 40, count/50, count/50, count/50)
         render_mesh()
         WIN.update()
         WIN.clear()
