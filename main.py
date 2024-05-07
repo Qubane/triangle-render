@@ -224,15 +224,20 @@ def draw_cube(x, y, z, xo, yo, zo, rx, ry, rz):
         x, y, z = rotate_x(poly[1][0], poly[1][1], poly[1][2], rx)
         x, y, z = rotate_y(x, y, z, ry)
         x, y, z = rotate_y(x, y, z, rz)
-        transformed_poly.append((x + xo, y + yo, z + zo))
+        if z + zo > transformed_poly[0][2]:
+            transformed_poly.insert(0, (x + xo, y + yo, z + zo))
+        else:
+            transformed_poly.append((x + xo, y + yo, z + zo))
 
         x, y, z = rotate_x(poly[2][0], poly[2][1], poly[2][2], rx)
         x, y, z = rotate_y(x, y, z, ry)
         x, y, z = rotate_y(x, y, z, rz)
-        transformed_poly.append((x + xo, y + yo, z + zo))
-
-        # sort poly's vertices by Z coord
-        transformed_poly.sort(key=lambda coord: coord[2], reverse=True)
+        if z + zo > transformed_poly[0][2]:
+            transformed_poly.insert(0, (x + xo, y + yo, z + zo))
+        elif z + zo > transformed_poly[1][2]:
+            transformed_poly.insert(1, (x + xo, y + yo, z + zo))
+        else:
+            transformed_poly.append((x + xo, y + yo, z + zo))
 
         MESH.append(transformed_poly)
 
