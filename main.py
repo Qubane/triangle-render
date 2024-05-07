@@ -5,6 +5,7 @@ from time import sleep
 
 # 3d rendering
 MESH = []
+NEAR_CLIP = 10
 
 # window
 WIN = tr.Window()
@@ -261,15 +262,30 @@ def render_mesh():
     # sort by first vertex, which would be the smallest
     MESH.sort(key=lambda x: x[0][2], reverse=True)
 
+    # clipping
+    for idx, poly in enumerate(MESH):
+        # ignore mesh that is fully behind the camera
+        if poly[0][2] < 0 and poly[1][2] < 0 and poly[2][2] < 0:
+            continue
+
+
+
     # screen centering (to make 0, 0 in the middle)
     hw, hh = WIN.width // 2, WIN.height // 2
 
     # render
     for idx, poly in enumerate(MESH):
+        # ignore mesh that is fully behind the camera
+        if poly[0][2] < 0 and poly[1][2] < 0 and poly[2][2] < 0:
+            continue
+
+        # calculate projected points
         x1, y1 = project_xyz(poly[0][0], poly[0][1], poly[0][2])
         x2, y2 = project_xyz(poly[1][0], poly[1][1], poly[1][2])
         x3, y3 = project_xyz(poly[2][0], poly[2][1], poly[2][2])
-        draw_filled(WIN, x1 + hw, y1 + hh, x2 + hw, y2 + hh, x3 + hw, y3 + hh, (idx + 1) % len(WIN.palette))
+
+        # plot the triangle
+        draw_outline(WIN, x1 + hw, y1 + hh, x2 + hw, y2 + hh, x3 + hw, y3 + hh, (idx + 1) % len(WIN.palette))
 
     # clear mesh
     MESH.clear()
